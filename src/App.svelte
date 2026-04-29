@@ -101,11 +101,11 @@
     {/each}
   </div>
   {#if error !== ""}
-    <div class="error">{error}</div>
+    <div class="message error">{error}</div>
   {:else if found}
-    <div class="info">Le mot a été trouvé!</div>
+    <div class="message success">Le mot a été trouvé!</div>
   {:else if currentRow >= 0}
-    <div class="info">Clique sur une case pour en changer la couleur puis clique sur Valider</div>
+    <div class="message info">Clique sur une case pour en changer la couleur puis clique sur Valider</div>
   {/if}
 {/if}
 
@@ -121,42 +121,49 @@
     height: 420px;
   }
 
-  .error {
-    background-color: #fdecea;
-    color: #b71c1c;
-    border: 1px solid #f5c6cb;
-    padding: 12px 16px;
-    border-radius: 6px;
-    font-size: 14px;
-    font-family: Arial, sans-serif;
-    margin: 10px 0;
+  .message {
     display: flex;
     align-items: center;
-    gap: 8px;
-  }
-
-  .error::before {
-    content: "⚠️";
-    font-size: 16px;
-  }
-
-  .info {
-    width: 350px;
-    background-color: #e8f4fd;
-    color: #0c5460;
-    border: 1px solid #bee5eb;
-    padding: 12px 16px;
+    gap: 10px;
+    padding: 12px 18px;
     border-radius: 6px;
     font-size: 14px;
-    font-family: Arial, sans-serif;
-    margin: 10px 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+    font-family: 'Segoe UI', sans-serif;
+    margin: 12px 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    max-width: 350px;
 
-  .info::before {
-    content: "ℹ️";
-    font-size: 16px;
+    &::before {
+      font-size: 16px;
+    }
+
+    &.info {
+      background-color: #e3f2fd;
+      color: #1565c0;
+      border: solid 1px #bee5eb;
+  
+      &::before {
+        content: "ℹ️";
+      }
+    }
+
+    &.success {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+      border: 1px solid #c3e6cb;
+  
+      &::before {
+        content: "✅";
+      }
+    }
+
+    &.error {
+      background-color: #ffebee;
+      color: #c62828;
+      border: 1px solid #f5c6cb;
+      &::before {
+        content: "❌";
+      }
+    }
   }
 </style>
