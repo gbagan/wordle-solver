@@ -18,13 +18,12 @@
 
 </script>
 
-
-<form class="options-form" method="dialog">
+<form method="dialog">
   <h2>Options</h2>
   <fieldset>
     <legend>Strategie de recherche</legend>
     {#each STRATEGY_OPTIONS as option}
-      <label class="option-row">
+      <label>
         <input
           type="radio"
           name="strategy"
@@ -36,7 +35,7 @@
       </label>
     {/each}
   </fieldset>
-  <div class="dialog-actions">
+  <div class="buttons">
     <button class="ui-button" type="button" onclick={onCancel}>Annuler</button>
     <button
       class="ui-button ui-button-primary"
@@ -49,32 +48,32 @@
 </form>
 
 <style>
-  .options-form {
+  form {
     display: flex;
     flex-direction: column;
     gap: 0.9rem;
     padding: 1rem;
   }
 
-  .options-form h2 {
+  h2 {
     margin: 0;
     font-size: 1.1rem;
   }
 
-  .options-form fieldset {
+  form fieldset {
     border: 1px solid #e5e5e5;
     border-radius: 0.5rem;
     padding: 0.75rem;
     margin: 0;
   }
 
-  .options-form legend {
+  legend {
     padding: 0 0.3rem;
     font-size: 0.9rem;
     font-weight: 600;
   }
 
-  .option-row {
+  label {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -83,7 +82,7 @@
     cursor: pointer;
   }
 
-  .dialog-actions {
+  .buttons {
     display: flex;
     justify-content: flex-end;
     gap: 0.5rem;
