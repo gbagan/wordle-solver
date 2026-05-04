@@ -23,13 +23,17 @@ function wordColoring(word: string, target: string): number {
   return colors.reduce((acc, v) => acc * 3 + v, 0);
 }
 
+export type Strategy = "minimax" | "average" |"random";
+
 export class Solver {
   fullList: string[];
   remaining: string[];
+  strategy: Strategy;
 
   constructor() {
     this.fullList = [];
     this.remaining = [];
+    this.strategy = "minimax";
   }
 
   load(text: string) {
@@ -50,7 +54,7 @@ export class Solver {
     this.remaining = this.remaining.filter(w => wordColoring(word, w) === color);
   }
 
-  #suggestionScore(suggestion: string) {
+  #maxScore = (suggestion: string) => {
     const scores = new Uint16Array(343);
     const n = this.remaining.length;
     for (let i = 0; i < n; i++) {
@@ -60,7 +64,23 @@ export class Solver {
     return Math.max(...scores);
   }
 
-  suggestion() {
+  #averageScore = (suggestion: string) => {
+    const scores = new Uint16Array(343);
+    const n = this.remaining.length;
+    for (let i = 0; i < n; i++) {
+      const color = wordColoring(suggestion, this.remaining[i]);
+      scores[color]++;
+    }
+    let total = 0;
+    for (let i = 0; i < 343; i++) {
+      if (scores[i] > 0) {
+        total += scores[i] * Math.log(scores[i]);
+      }
+    }
+    return total;
+  }
+
+  #suggestion(scoreFn: (suggestion: string) => number) {
     if (this.remaining.length <= 2) {
       return this.remaining[0];
     }
@@ -69,12 +89,27 @@ export class Solver {
     let bestWord = "";
     for (let i = 0; i < n; i++) {
       const word = this.fullList[i];
-      const score = this.#suggestionScore(word);
+      const score = scoreFn(word);
       if (score < bestScore) {
         bestScore = score;
         bestWord = word;
       }
     }
     return bestWord;
+  }
+
+  #suggestionRandom() {
+    const idx = Math.floor(Math.random() * this.remaining.length);
+    return this.remaining[idx];
+  }
+
+  suggestion() {
+    if (this.strategy === "random") {
+      return this.#suggestionRandom();
+    } else if (this.strategy === "average") {
+      return this.#suggestion(this.#averageScore);
+    } else {
+      return this.#suggestion(this.#maxScore);
+    }
   }
 }

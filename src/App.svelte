@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import CellView from "./components/CellView.svelte";
-  import { Solver } from "./lib/solver";
+  import { Solver, type Strategy } from "./lib/solver";
+  import Options from "./components/Options.svelte";
 
   type Cell = { letter: string, color: number };
   type Grid = Cell[][];
@@ -15,6 +16,7 @@
   let currentRow = $state(-1);
   let error = $state("");
   let found = $state(false);
+  let optionsDialog: HTMLDialogElement | null = $state(null);
 
   let solving = $derived(currentRow !== -1 && !found && error === "");
 
@@ -29,8 +31,14 @@
         grid[i][j].color = -1;
       }
     }
+    const suggestion = solver.suggestion();
+    addRow(suggestion);
+  }
 
-    addRow("arise");
+  function applyOptions(strat: Strategy) {
+    solver.strategy = strat;
+    newGame();
+    closeOptionsDialog();
   }
 
   function addRow(text: string) {
@@ -68,6 +76,14 @@
     addRow(suggestion);
   }
 
+  function openOptionsDialog() {
+    optionsDialog?.showModal();
+  }
+
+  function closeOptionsDialog() {
+    optionsDialog?.close();
+  }
+
   onMount(async () => {
     const request = new Request("./wordle.txt");
     const response = await fetch(request);
@@ -77,6 +93,7 @@
     const text = await response.text();
     isLoaded = true;
     solver.load(text);
+    solver.strategy = "minimax";
   });
 </script>
 
@@ -84,10 +101,17 @@
    Loading
 {:else}
   <h1>Solveur de Wordle</h1>
-  <div>
-    <button class="ui-button" onclick={newGame}>Nouvelle partie</button>
+  <div class="actions">
+    <button class="ui-button" onclick={openOptionsDialog}>Nouvelle partie</button>
     <button class="ui-button" disabled={!solving} onclick={validate}>Valider</button>
   </div>
+  <dialog class="options-dialog" bind:this={optionsDialog}>
+    <Options
+      strategy={solver.strategy}
+      onCancel={closeOptionsDialog}
+      onOk={applyOptions}
+    />
+  </dialog>
   <div class="grid">
     {#each grid as row, i}
       {#each row as {letter, color}, j}
@@ -111,6 +135,24 @@
 
 
 <style>
+ .options-dialog {
+    width: min(22rem, calc(100vw - 1.5rem));
+    border: 1px solid #d9d9d9;
+    border-radius: 0.6rem;
+    padding: 0;
+  }
+
+  .options-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.45);
+  }
+
+  .actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
   .grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
